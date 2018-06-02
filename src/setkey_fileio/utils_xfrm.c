@@ -18,7 +18,7 @@
 #include "utils_xfrm.h"
 #define LOG_TAG "setkey"
 #include <log/log.h>
-#include <cutils/log.h>
+
 
 
 

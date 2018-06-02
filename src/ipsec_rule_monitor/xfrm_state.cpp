@@ -35,7 +35,6 @@
 #include <linux/in6.h>
 #define LOG_TAG "ipsec_policy_mont"
 #include <log/log.h>
-#include <cutils/log.h>
 #include "utils.h"
 
 

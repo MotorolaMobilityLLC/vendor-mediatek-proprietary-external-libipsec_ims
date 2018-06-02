@@ -12,7 +12,7 @@
 #include "setkey_xfrm_parse.h"
 #define LOG_TAG "setkey"
 #include <log/log.h>
-#include <cutils/log.h>
+
 
 
 void rtnl_close_xfrm(struct rtnl_handle_xfrm *rth_xfrm)
@@ -118,7 +118,7 @@ int rtnl_listen_xfrm(struct rtnl_handle_xfrm *rtnl_xfrm, rtnl_filter_t_xfrm hand
 int rtnl_accept_msg_xfrm(struct rtnl_handle_xfrm * rth ,struct nlmsghdr *n)
 {
 	char pid[128] = {0};
-	property_get("net.ims.volte.pid",pid,"-1");
+	property_get("vendor.net.ims.volte.pid",pid,"-1");
 	pid_t volte_pid =atoi(pid);
 	/*no previous volte_stack policy&& state is set*/
 	switch (n->nlmsg_type) {

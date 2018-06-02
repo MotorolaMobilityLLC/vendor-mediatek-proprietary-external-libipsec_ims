@@ -18,7 +18,7 @@
 #endif
 #define LOG_TAG "setkey"
 #include <log/log.h>
-#include <cutils/log.h>
+
 
 #if 0
 extern void plog_android(int level, char *format, ...);
@@ -620,8 +620,8 @@ int setkey_SP_tunnel_transport(char * src_range,char * dst_range,enum PROTOCOL_T
 
     char version[128] = {0};
     int ret_mapping = 0;
-    property_get("net.ims.ipsec.version",version,"");
-    //plog_android(LLV_WARNING,"getproperty-- net.ims.ipsec.version :%s\n",version); 
+    property_get("vendor.net.ims.ipsec.version",version,"");
+    //plog_android(LLV_WARNING,"getproperty-- vendor.net.ims.ipsec.version :%s\n",version); 
     if(strcmp(version,"2.0")==0)
     {
 	ret_mapping = setkey_SP(src_range,dst_range,protocol,port_src,port_dst,ipsec_type1,mode1, direction,u_id1);

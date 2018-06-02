@@ -27,7 +27,7 @@
 #include <ifaddrs.h>
 #include <net/if.h>
 #define LOG_TAG "ipsec_policy_mont"
-#include <cutils/log.h>
+#include <log/log.h>
 #include <linux/xfrm.h>
 #include <utils.h>
 #include "ipsec_multilayer.h"

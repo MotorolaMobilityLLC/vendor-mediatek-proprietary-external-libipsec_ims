@@ -16,7 +16,7 @@
 #include "utils_xfrm.h"
 #define LOG_TAG "setkey"
 #include <log/log.h>
-#include <cutils/log.h>
+
 
 int volte_pid = -1;
 /*only record volte_stack's pid for flush_SA_SP_exist's use*/
@@ -27,7 +27,7 @@ void set_property_volte()
 		if(volte_pid ==-1)
 		{
 			sprintf(pid,"%d",getpid());
-			int ret = property_set("net.ims.volte.pid",pid);
+			int ret = property_set("vendor.net.ims.volte.pid",pid);
   			if(ret != 0)
   			{
       				ALOGE("set property failed,errno:%d\n",errno);
