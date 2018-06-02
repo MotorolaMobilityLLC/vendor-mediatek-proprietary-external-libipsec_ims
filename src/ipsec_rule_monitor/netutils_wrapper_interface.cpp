@@ -37,6 +37,7 @@
 #include <string>
 #include <list>
 #include "netutils_wrapper_interface.h"
+#include "../../../../system/netdagent/include/forkexecwrap/fork_exec_wrap.h"
 
 const char * const IPTABLES_PATH = "/system/bin/iptables-wrapper-1.0";
 const char * const IP6TABLES_PATH = "/system/bin/ip6tables-wrapper-1.0";
@@ -60,10 +61,7 @@ static int execCommand(int argc, const char *argv[], bool silent) {
     int res;
     int status;
 
-    //Muga: liblogwrap cannot be used by vendor module.
-    //      please fix it.
-    //res = android_fork_execvp(argc, (char **)argv, &status, false, !silent);
-    res = 0;
+    res = android_fork_execvp_ext(argc, (char **)argv, &status, false, LOG_ALOG,!silent,NULL,NULL,0);
     if (res || !WIFEXITED(status) || WEXITSTATUS(status)) {
         if (!silent) {
             logExecError(argv, res, status);

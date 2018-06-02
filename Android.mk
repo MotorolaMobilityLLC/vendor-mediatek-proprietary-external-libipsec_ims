@@ -117,7 +117,7 @@ LOCAL_MODULE := ipsec_mon
 
 LOCAL_MODULE_TAGS := optional
 
-LOCAL_SHARED_LIBRARIES := libc libcutils liblog
+LOCAL_SHARED_LIBRARIES := libc libcutils liblog libforkexecwrap
 
 LOCAL_SHARED_LIBRARIES += libipsec_ims_shr
 
