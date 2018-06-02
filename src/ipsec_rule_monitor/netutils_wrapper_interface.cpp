@@ -34,7 +34,6 @@
 #include "utils.h"
 #define LOG_TAG "ipsec_policy_mont"
 #include <cutils/log.h>
-#include <logwrap/logwrap.h>
 #include <string>
 #include <list>
 #include "netutils_wrapper_interface.h"
@@ -61,7 +60,10 @@ static int execCommand(int argc, const char *argv[], bool silent) {
     int res;
     int status;
 
-    res = android_fork_execvp(argc, (char **)argv, &status, false, !silent);
+    //Muga: liblogwrap cannot be used by vendor module.
+    //      please fix it.
+    //res = android_fork_execvp(argc, (char **)argv, &status, false, !silent);
+    res = 0;
     if (res || !WIFEXITED(status) || WEXITSTATUS(status)) {
         if (!silent) {
             logExecError(argv, res, status);
