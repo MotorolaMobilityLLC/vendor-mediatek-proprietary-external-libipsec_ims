@@ -291,6 +291,11 @@ int IptablesInterface::enableIptables()
 
 	//enable forwarding
 	res |= execNdcCmd("ipfwd", "enable", mInIface.c_str(), NULL);
+	//add forward rule
+	res |= execIpCmd(mFamily, "rule", "add", "from", "all", "iif",  mInIface.c_str(), "fwmark", "0x0/0xffff", "lookup", mTableId.c_str(), "prio", "25000", NULL);
+        //add forward route
+        res |= execIpCmd(mFamily, "route", "add", mNxthop.c_str(), "dev", mOutIface.c_str(), "table", mTableId.c_str(), NULL);
+
 	//add rorward mark
 	res |= execIptables(V4V6, "-t", "mangle", "-I", LOCAL_MANGLE_PREROUTING, "-i", mInIface.c_str(), "-j", "MARK", "--set-mark", FORWARD_MARK, NULL);
 	//add forward exception iptables
@@ -305,8 +310,7 @@ int IptablesInterface::enableIptables()
 	//add datasaver input exception iptables
 	res |= execIptables(strchr(mIMSinterfaceIP.c_str(),':')?V6:V4, "-t", "filter", "-I", LOCAL_HAPPY_BOX, "-i", mOutIface.c_str(), "-d", mIMSinterfaceIP.c_str(), "-j", "RETURN", NULL);
 	res |= execIptables(strchr(mEpdgTunnel.c_str(),':')?V6:V4, "-t", "filter", "-I", LOCAL_HAPPY_BOX, "-i", mOutIface.c_str(), "-s", mEpdgTunnel.c_str(), "-j", "RETURN", NULL);
-	//add forward route
-	res |= execIpCmd(mFamily, "route", "add", mNxthop.c_str(), "dev", mOutIface.c_str(), "table", mTableId.c_str(), NULL);
+
 	return res;
 }
 
@@ -331,6 +335,8 @@ int IptablesInterface::disableIptables()
 	//del datasaver input exception iptables
 	res |= execIptables(strchr(mIMSinterfaceIP.c_str(),':')?V6:V4, "-t", "filter", "-D", LOCAL_HAPPY_BOX, "-i", mOutIface.c_str(), "-d", mIMSinterfaceIP.c_str(), "-j", "RETURN", NULL);
 	res |= execIptables(strchr(mEpdgTunnel.c_str(),':')?V6:V4, "-t", "filter", "-D", LOCAL_HAPPY_BOX, "-i", mOutIface.c_str(), "-s", mEpdgTunnel.c_str(), "-j", "RETURN", NULL);
+	//del/forward rule
+	res |= execIpCmd(mFamily, "rule", "del", "from", "all", "iif",  mInIface.c_str(), "fwmark", "0x0/0xffff", "lookup", mTableId.c_str(), "prio", "25000", NULL);
 	//del forward route
 	res |= mRefCnt ? 0 : execIpCmd(mFamily, "route", "del", mNxthop.c_str(), "dev", mOutIface.c_str(), "table", mTableId.c_str(), NULL);
     return res;
