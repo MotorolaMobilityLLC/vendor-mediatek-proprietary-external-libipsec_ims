@@ -154,7 +154,9 @@ int getifbyaddr(char *ifname, char *addr, __u8 prefix_len, __u16 family)
 			tmp = ForwardRule + i;
 			if(!strcmp(tmp->local_ip_c, addr)) {
 				strncpy(ifname, tmp->ims_ifname, strlen(tmp->ims_ifname));
+#ifdef INIT_ENG_BUILD
 				ALOGD("getifbyaddr, ifname %s\n", ifname);
+#endif
 				return 1;
 			}
 		}
@@ -465,7 +467,9 @@ int enable_interface_forward(char *src, __u8 pref_s, char *dst,__u8 pref_d, char
 	//set ip layer forwarding
 	channel = forward_rule_isold(src, pref_s, dst, pref_d, family);
 	if(channel >= 0) {
+#ifdef INIT_ENG_BUILD
 		ALOGI("forward rule is old and ioctl has been configured\n");
+#endif
 		forward_rule_add_old(channel, tunnel_src, tunnel_dst);
 		return 0;
 	}
@@ -474,10 +478,10 @@ int enable_interface_forward(char *src, __u8 pref_s, char *dst,__u8 pref_d, char
 		ALOGE("add new forward record failed\n");
 		return -1;
 	}
-	if(!set_interface_ipforward(interface, "wlan0", src, dst, pref_d, tunnel_dst, family, IPFORWARD_ON))
-		ALOGD("ip forward is enabling\n");
-	if(!set_interface_driver_forward(src, pref_s, dst, pref_d, family, interface, IPFORWARD_ON))
-		ALOGD("enable driver forward success\n");
+	if(set_interface_ipforward(interface, "wlan0", src, dst, pref_d, tunnel_dst, family, IPFORWARD_ON))
+		ALOGD("ip forward enabled failed\n");
+	if(set_interface_driver_forward(src, pref_s, dst, pref_d, family, interface, IPFORWARD_ON))
+		ALOGD("enable driver forward failed\n");
 	return 0;
 }
 
@@ -501,9 +505,9 @@ int disable_interface_forward(char * src, __u8 pref_s, char * dst,__u8 pref_d, _
 		ALOGI("forward rule has not been deleted actually\n");
 		return 0;
 	}
-	if(!set_interface_ipforward(interface, "wlan0", src, dst, pref_d,  tunnel_dst, family, IPFORWARD_OFF))
-		ALOGD("ip forward is disabling\n");
-	if(!set_interface_driver_forward(src, pref_s, dst, pref_d, family, interface, IPFORWARD_OFF))
-		ALOGD("disable driver forward success\n");
+	if(set_interface_ipforward(interface, "wlan0", src, dst, pref_d,  tunnel_dst, family, IPFORWARD_OFF))
+		ALOGD("ip forward disable failed\n");
+	if(set_interface_driver_forward(src, pref_s, dst, pref_d, family, interface, IPFORWARD_OFF))
+		ALOGD("disable driver forward failed\n");
 	return 0;
 }

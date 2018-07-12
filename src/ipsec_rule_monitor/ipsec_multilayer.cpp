@@ -301,7 +301,7 @@ int addattr_l(struct nlmsghdr *n, int maxlen, int type, const void *data,
 	struct rtattr *rta;
 
 	if (NLMSG_ALIGN(n->nlmsg_len) + RTA_ALIGN(len) > (unsigned int)maxlen) {
-		ALOGD( "addattr_l ERROR: message exceeded bound of %d\n",maxlen);
+		ALOGD( "addattr_l ERROR: message exceeded bound of %d,nlmsg_len:%d,len:%d\n",maxlen,NLMSG_ALIGN(n->nlmsg_len), RTA_ALIGN(len));
 		return -1;
 	}
 
@@ -359,21 +359,29 @@ void set2layeripsecrules_xfrm(siptx_req_ipsec_connect_struct * Tunndatabse,siptx
 			memcpy(dir_c,"out",strlen("out"));
 			if(!Handover) {
 				should_2layer = compare_ip_for_prefix(tmp->family, &tmp->local_ip_c[0], tmp->pref_s, Transdata_var.family, &Transdata_var.local_ip_c[0], Transdata_var.pref_s) && strcmp(tmp->tunnel_ip_s,Transdata_var.local_ip_c)!=0;
+#ifdef INIT_ENG_BUILD
 				ALOGD("compare out:should_2layer = %d;tmp->local_ip_c:%s,tmp->pref_s:%d,Transdata_var.local_ip_c:%s,tmp->tunnel_ip_s:%s,Transdata_var.local_ip_c:%s,Transdata_var.pref_s:%d\n",should_2layer, tmp->local_ip_c,tmp->pref_s,Transdata_var.local_ip_c,tmp->tunnel_ip_s,Transdata_var.local_ip_c,Transdata_var.pref_s);
+#endif
 			}
 			else {
 				should_2layer = compare_ip_for_prefix(tmp->family, &tmp->local_ip_c[0], tmp->pref_s, Transdata_var.family, &Transdata_var.local_ip_c[0], Transdata_var.pref_s) && strcmp(Transdata_var.tunnel_ip_s,tmp->local_ip_c)!=0;
+#ifdef INIT_ENG_BUILD
 				ALOGD("compare out:should_2layer = %d;tmp->local_ip_c:%s,tmp->pref_s:%d,Transdata_var.local_ip_c:%s,tmp->tunnel_ip_s:%s,Transdata_var.local_ip_c:%s,Transdata_var.pref_s:%d\n",should_2layer, tmp->local_ip_c,tmp->pref_s,Transdata_var.local_ip_c,Transdata_var.tunnel_ip_s,tmp->local_ip_c,Transdata_var.pref_s);
+#endif
 			}
 			break;
 			case XFRM_POLICY_IN:
 			memcpy(dir_c,"in",strlen("in"));
 			if(!Handover) {
 				should_2layer = compare_ip_for_prefix(tmp->family, &tmp->target_ip_s[0], tmp->pref_d, Transdata_var.family, &Transdata_var.target_ip_s[0], Transdata_var.pref_d) && strcmp(tmp->tunnel_ip_d,Transdata_var.target_ip_s)!=0;
+#ifdef INIT_ENG_BUILD
 				ALOGD("compare in:should_2layer = %d;tmp->target_ip_s:%s,tmp->pref_d:%d,Transdata_var.target_ip_s:%s,Transdata_var.pref_d:%d,tmp->tunnel_ip_s:%s,Transdata_var.local_ip_c:%s\n",should_2layer, tmp->target_ip_s,tmp->pref_d,Transdata_var.target_ip_s,Transdata_var.pref_d,tmp->tunnel_ip_d,Transdata_var.target_ip_s);
+#endif
 			} else {
 				should_2layer = compare_ip_for_prefix(tmp->family, &tmp->target_ip_s[0], tmp->pref_d, Transdata_var.family, &Transdata_var.target_ip_s[0], Transdata_var.pref_d) && strcmp(Transdata_var.tunnel_ip_d,tmp->target_ip_s)!=0;
+#ifdef INIT_ENG_BUILD
 				ALOGD("compare in:should_2layer = %d;tmp->target_ip_s:%s,tmp->pref_d:%d,Transdata_var.target_ip_s:%s,Transdata_var.pref_d:%d,tmp->tunnel_ip_s:%s,Transdata_var.local_ip_c:%s\n",should_2layer, tmp->target_ip_s,tmp->pref_d,Transdata_var.target_ip_s,Transdata_var.pref_d,Transdata_var.tunnel_ip_d,tmp->target_ip_s);
+#endif
 			}
 			break;
 			default: //forward or other action
@@ -386,7 +394,9 @@ void set2layeripsecrules_xfrm(siptx_req_ipsec_connect_struct * Tunndatabse,siptx
 		}
 
 		/*2 layer policy will be set, enable ccmni4 forward once*/
+#ifdef INIT_ENG_BUILD
 		ALOGD("check ccmni forwarding, dir %d, handover %d", tmp->dir, Handover);
+#endif
 		if(tmp->dir == XFRM_POLICY_OUT)
 		{
 			char ifname[IFNAMSIZ] = {0};
@@ -422,7 +432,7 @@ void set2layeripsecrules_xfrm(siptx_req_ipsec_connect_struct * Tunndatabse,siptx
 			tmpl->id.proto = tmp->ipsec_type;
 		}
 
-	    tmpls_len += sizeof(*tmpl);
+	        tmpls_len += sizeof(*tmpl);
 		tmpl = (struct xfrm_user_tmpl *)((char *)tmpls_buf + tmpls_len);
 		tmpl->mode = XFRM_MODE_TUNNEL;
 		tmpl->aalgos = (~(__u32)0);
@@ -488,6 +498,8 @@ void set2layeripsecrules_xfrm(siptx_req_ipsec_connect_struct * Tunndatabse,siptx
 				ALOGD("set2layeripsecrules_xfrm send POLICY_FWD failed,errno:%d",errno);
 		}
 		tmpls_len = 0;
+		req.n.nlmsg_len = NLMSG_LENGTH(sizeof(req.xpinfo));
+		memset(&tmpls_buf, 0, sizeof(tmpls_buf));
 	}
 }
 
@@ -633,7 +645,9 @@ void change1layeripsecrules_xfrm(siptx_req_ipsec_connect_struct * Transdatabase,
 		if(tmp->used == 0)
 			continue;
                 should_1layer = compare_ip_for_prefix(tmp->family, &tmp->local_ip_c[0], tmp->pref_s, xpid->sel.family, srcbuf, xpid->sel.prefixlen_s) && compare_ip_for_prefix(tmp->family,&tmp->target_ip_s[0], tmp->pref_d,  xpid->sel.family, dstbuf, xpid->sel.prefixlen_d);
+#ifdef INIT_ENG_BUILD
 		ALOGD("compare out:should_1layer = %d;tmp->local_ip_c:%s,tmp->pref_s:%d,srcbuf:%s,xpid->sel.prefixlen_s:%d,tmp->target_ip_s:%s,tmp->pref_d:%d, dstbuf:%s, xpid->sel.prefixlen_d:%d\n",should_1layer, tmp->local_ip_c,tmp->pref_s,srcbuf,xpid->sel.prefixlen_s,tmp->target_ip_s,tmp->pref_d,dstbuf, xpid->sel.prefixlen_d);
+#endif
 		if(!should_1layer)
 			continue;
 
@@ -680,14 +694,17 @@ void change1layeripsecrules_xfrm(siptx_req_ipsec_connect_struct * Transdatabase,
 						  (void *)tmpls_buf, tmpls_len);
 		}
 		if(send(rth.fd, (void*)&req, sizeof(req), 0)<0)
-			ALOGD("set2layeripsecrules_xfrm send failed,errno:%d",errno);
+			ALOGD("change1layeripsecrules_xfrm send failed,errno:%d",errno);
 		if(req.xpinfo.dir ==XFRM_POLICY_IN)
 		{
 			req.xpinfo.dir = XFRM_POLICY_FWD;
 			if(send(rth.fd, (void*)&req, sizeof(req), 0)<0)
-				ALOGD("set2layeripsecrules_xfrm send POLICY_FWD failed,errno:%d",errno);
+				ALOGD("change1layeripsecrules_xfrm send POLICY_FWD failed,errno:%d",errno);
 		}
 		tmpls_len = 0;
+		memset(&tmpls_buf, 0, sizeof(tmpls_buf));
+
+		req.n.nlmsg_len = NLMSG_LENGTH(sizeof(req.xpinfo));
 	}
 }
 

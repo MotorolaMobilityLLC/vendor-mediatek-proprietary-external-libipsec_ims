@@ -49,6 +49,8 @@
 #include <log/log.h>
 #include "utils.h"
 #include <cutils/properties.h>
+#include <sys/resource.h>
+#include <sched.h>
 
 struct rtnl_handle rth = { -1,{0,0,0,0},{0,0,0,0},0,0 };
 struct rtnl_handle rth_link = { -1,{0,0,0,0},{0,0,0,0},0,0 };
@@ -492,6 +494,16 @@ int main(void)
 	char version[128] = {0};
 	unsigned groups = ~((unsigned)0); /* XXX */
 	//memset(&filter, 0, sizeof(filter));
+
+	pid_t tid = gettid();
+	int ret_prio = setpriority(0, tid, -20);
+	ALOGD("threaid priority %d,result:%d\n",getpriority(0,gettid()),ret_prio);
+
+	cpu_set_t cpuset;
+	CPU_ZERO(&cpuset);
+	CPU_SET(3,&cpuset);
+	sched_setaffinity(0,sizeof(cpu_set_t),&cpuset);
+
 	rtnl_close(&rth);
 	rtnl_close(&rth_link);
 	groups |= (nl_mgrp(XFRMNLGRP_ACQUIRE)|nl_mgrp(XFRMNLGRP_EXPIRE)|nl_mgrp(XFRMNLGRP_SA)|nl_mgrp(XFRMNLGRP_POLICY));
