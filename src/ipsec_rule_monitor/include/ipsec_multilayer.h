@@ -58,7 +58,7 @@ typedef struct {
     int                 user;   //volte_stack's pid
 } siptx_req_ipsec_connect_struct;
 
-#define RECORD_COUNT 32
+#define RECORD_COUNT 128
 #define IPFORWARD_ON 1
 #define IPFORWARD_OFF 0
 
