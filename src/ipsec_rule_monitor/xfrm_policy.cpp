@@ -108,8 +108,10 @@ static void xfrm_tmpl_process(struct xfrm_user_tmpl *tmpls, int len,
 		{
 			if(nlmsg_type == XFRM_MSG_DELPOLICY)
 			{
+#ifdef INIT_ENG_BUILD
 				ALOGD("maybe it is previous TransportRule delete");
-			deleteRuledatabase(TransportRule,xpid,srcbuf,dstbuf);
+#endif
+				deleteRuledatabase(TransportRule,xpid,srcbuf,dstbuf);
 			} else {
 				i =  compare_oldRuledatabase(TransportRule,xpinfo,srcbuf, dstbuf,srcbuf_tun,dstbuf_tun,tmpls);
 				/*new records begin, record transportRule*/

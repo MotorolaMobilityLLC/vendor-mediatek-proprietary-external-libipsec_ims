@@ -110,7 +110,7 @@ LOCAL_SRC_FILES := \
 		   src/ipsec_rule_monitor/netutils_wrapper_interface.cpp
 
 ifneq (,$(filter userdebug eng,$(TARGET_BUILD_VARIANT)))
-LOCAL_CFLAGS += -DINIT_ENG_BUILD
+LOCAL_CPPFLAGS += -DINIT_ENG_BUILD
 endif
 
 LOCAL_MODULE := ipsec_mon
