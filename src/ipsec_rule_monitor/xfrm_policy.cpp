@@ -37,7 +37,6 @@
 #include "utils.h"
 #define LOG_TAG "ipsec_policy_mont"
 #include <log/log.h>
-#include <cutils/log.h>
 #include <linux/capability.h>
 #include <cutils/properties.h>
 
@@ -46,7 +45,7 @@
 siptx_req_ipsec_connect_struct TunnelRule[RECORD_COUNT] = {{0,0,0,"\0","\0","\0","\0",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}};
 siptx_req_ipsec_connect_struct TransportRule[RECORD_COUNT] = {{0,0,0,"\0","\0","\0","\0",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}};
 extern int record_only;
-#define IMSOVERLTE_WIFI "net.handover.rat"
+//#define IMSOVERLTE_WIFI "net.handover.rat"
 
 
 

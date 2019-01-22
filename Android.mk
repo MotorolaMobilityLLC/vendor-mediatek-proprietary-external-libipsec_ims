@@ -31,7 +31,7 @@ LOCAL_C_INCLUDES += \
         $(LOCAL_PATH)/src/setkey_fileio  \
 
 
-
+LOCAL_HEADER_LIBRARIES := liblog_headers
 LOCAL_SHARED_LIBRARIES := libcutils libcrypto
 LOCAL_CFLAGS := -DANDROID_CHANGES -DHAVE_CONFIG_H
 LOCAL_CFLAGS += -Wno-sign-compare -Wno-missing-field-initializers
@@ -59,7 +59,7 @@ LOCAL_C_INCLUDES += \
         $(LOCAL_PATH)/src/setkey_fileio  \
 
 
-
+LOCAL_HEADER_LIBRARIES := liblog_headers
 LOCAL_SHARED_LIBRARIES := libcutils libcrypto liblog
 
 LOCAL_CFLAGS := -DANDROID_CHANGES -DHAVE_CONFIG_H
@@ -86,16 +86,16 @@ LOCAL_SRC_FILES := \
 LOCAL_MODULE := test_xfrm
 
 LOCAL_MODULE_TAGS := optional
-
+LOCAL_HEADER_LIBRARIES := liblog_headers
 LOCAL_SHARED_LIBRARIES := libc libcutils liblog libipsec_ims_shr
 
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/src     \
                      $(LOCAL_PATH)/src/setkey_fileio  
 
-
-include $(BUILD_EXECUTABLE)
-
+LOCAL_PROPRIETARY_MODULE := true
+LOCAL_MODULE_OWNER := mtk
+include $(MTK_EXECUTABLE)
 
 include $(CLEAR_VARS)
 
@@ -116,7 +116,7 @@ endif
 LOCAL_MODULE := ipsec_mon
 
 LOCAL_MODULE_TAGS := optional
-
+LOCAL_HEADER_LIBRARIES := liblog_headers
 LOCAL_SHARED_LIBRARIES := libc libcutils liblog libforkexecwrap
 
 LOCAL_SHARED_LIBRARIES += libipsec_ims_shr

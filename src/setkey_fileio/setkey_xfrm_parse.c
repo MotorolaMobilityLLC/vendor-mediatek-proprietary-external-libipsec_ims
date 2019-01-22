@@ -17,7 +17,7 @@
 #include "setkey_xfrm_parse.h"
 #define LOG_TAG "setkey"
 #include <log/log.h>
-#include <cutils/log.h>
+
 
 
 const struct typeent xfrmproto_types[]= {

@@ -47,7 +47,6 @@
 #include "ipsec_multilayer.h"
 #define LOG_TAG "ipsec_policy_mont"
 #include <log/log.h>
-#include <cutils/log.h>
 #include "utils.h"
 #include <cutils/properties.h>
 
@@ -501,13 +500,13 @@ int main(void)
 		exit(1);
 	if (rtnl_open_byproto(&rth_link, RTMGRP_LINK | RTMGRP_IPV4_ROUTE | RTMGRP_IPV6_ROUTE, NETLINK_ROUTE) < 0)
 		exit(1);
-	int ret = property_set("net.ims.ipsec.version","2.0");
+	int ret = property_set("vendor.net.ims.ipsec.version","2.0");
 	if(ret != 0) {
 		ALOGE("set property failed,errno:%d\n",errno);
 		exit(1);
 	} else {
-		property_get("net.ims.ipsec.version",version,"");
-		ALOGD("getproperty-- net.ims.ipsec.version :%s\n",version);
+		property_get("vendor.net.ims.ipsec.version",version,"");
+		ALOGD("getproperty-- vendor.net.ims.ipsec.version :%s\n",version);
 	}
 	/*dump previous policy rules*/
 	ret_send = rtnl_wilddump_request(&rth, AF_UNSPEC, XFRM_MSG_GETPOLICY);

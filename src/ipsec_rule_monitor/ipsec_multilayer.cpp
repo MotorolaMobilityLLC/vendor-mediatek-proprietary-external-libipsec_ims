@@ -41,7 +41,7 @@
 #include "ipsec_multilayer.h"
 #define LOG_TAG "ipsec_policy_mont"
 #include <log/log.h>
-#include <cutils/log.h>
+
 extern struct rtnl_handle rth;
 
 void rt_addr_ntoa(int af, const void *addr, char *buf, int buflen)

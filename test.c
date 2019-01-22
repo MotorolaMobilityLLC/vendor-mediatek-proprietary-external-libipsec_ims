@@ -8,7 +8,6 @@
 #include <sys/wait.h>
 #include <linux/capability.h>
 #include <pthread.h>
-#include <private/android_filesystem_config.h>
 #include <sys/capability.h>
 #include <sys/prctl.h>
 #include <fcntl.h>
@@ -16,7 +15,7 @@
 #include "src/setkey_fileio/setkey_fileio.h"
 #define LOG_TAG "setkey"
 #include <log/log.h>
-#include <cutils/log.h>
+
 
 #if 0
 /* Set UID to inet w/ CAP_NET_RAW, CAP_NET_ADMIN and CAP_NET_BIND_SERVICE
