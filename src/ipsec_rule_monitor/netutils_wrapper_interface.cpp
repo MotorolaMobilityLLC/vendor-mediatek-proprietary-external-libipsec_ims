@@ -38,6 +38,7 @@
 #include <list>
 #include "netutils_wrapper_interface.h"
 #include "../../../../system/netdagent/include/forkexecwrap/fork_exec_wrap.h"
+#include "ifcutils/ifc.h"
 
 const char * const IPTABLES_PATH = "/system/bin/iptables-wrapper-1.0";
 const char * const IP6TABLES_PATH = "/system/bin/ip6tables-wrapper-1.0";
@@ -236,6 +237,7 @@ int IptablesInterface::start()
 	pthread_t thread;
 	if(pthread_create(&thread, NULL, IptablesInterface::threadStart, this)) {
 		ALOGE("pthread create failed(%s)", strerror(errno));
+		ifc_set_txq_state(mInIface.c_str(),0x1);
 		return -1;
 	}
 	pthread_detach(thread);
@@ -300,6 +302,8 @@ int IptablesInterface::enableIptables()
 	res |= execIptables(V4V6, "-t", "mangle", "-I", LOCAL_MANGLE_PREROUTING, "-i", mInIface.c_str(), "-j", "MARK", "--set-mark", FORWARD_MARK, NULL);
 	//add forward exception iptables
 	res |= execIptables(V4V6, "-t", "filter", "-I", LOCAL_FILTER_FORWARD, "-i", mInIface.c_str(), "-o", mOutIface.c_str(), "-j", "ACCEPT", NULL);
+	// start tx queue
+	ifc_set_txq_state(mInIface.c_str(),0x1);
 	//add powersave or dozable output exception iptables
 	res |= execIptables(V4V6, "-t", "filter", "-I", LOCAL_FILTER_OUT, "-o", mOutIface.c_str(), "-d", mEpdgTunnel.c_str(), "-j", "RETURN", NULL);
 	//add datasaver output exception iptables

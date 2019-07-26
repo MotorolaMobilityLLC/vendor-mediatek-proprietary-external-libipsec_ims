@@ -117,12 +117,13 @@ LOCAL_MODULE := ipsec_mon
 
 LOCAL_MODULE_TAGS := optional
 LOCAL_HEADER_LIBRARIES := liblog_headers
-LOCAL_SHARED_LIBRARIES := libc libcutils liblog libforkexecwrap
+LOCAL_SHARED_LIBRARIES := libc libcutils liblog libforkexecwrap libifcutils_mtk
 
 LOCAL_SHARED_LIBRARIES += libipsec_ims_shr
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/src     \
                      $(LOCAL_PATH)/src/ipsec_rule_monitor/include
+LOCAL_C_INCLUDES += $(MTK_PATH_SOURCE)/system/netdagent/include
 LOCAL_CFLAGS := -Wall
 LOCAL_CFLAGS += -DMOBIKE
 LOCAL_PROPRIETARY_MODULE := true

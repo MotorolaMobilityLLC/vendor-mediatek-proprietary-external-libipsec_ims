@@ -32,6 +32,7 @@
 #include <utils.h>
 #include "ipsec_multilayer.h"
 #include "netutils_wrapper_interface.h"
+#include "ifcutils/ifc.h"
 
 #define SIOCFWDFILTER (SIOCDEVPRIVATE+2)
 #define IPV4 0x40
@@ -478,6 +479,8 @@ int enable_interface_forward(char *src, __u8 pref_s, char *dst,__u8 pref_d, char
 		ALOGE("add new forward record failed\n");
 		return -1;
 	}
+	//stop tx queue
+	ifc_set_txq_state(interface,0x0);
 	if(set_interface_ipforward(interface, "wlan0", src, dst, pref_d, tunnel_dst, family, IPFORWARD_ON))
 		ALOGD("ip forward enabled failed\n");
 	if(set_interface_driver_forward(src, pref_s, dst, pref_d, family, interface, IPFORWARD_ON))
