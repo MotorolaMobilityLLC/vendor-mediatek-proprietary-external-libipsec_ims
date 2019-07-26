@@ -3,21 +3,7 @@
 * Modification based on code covered by the mentioned copyright
 * and/or permission notice(s).
 */
-/*
- * Copyright (C) 2012 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+
 
 #include <ctype.h>
 #include <errno.h>
@@ -46,7 +32,7 @@ const char * const NDC_PATH = "/system/bin/ndc-wrapper-1.0";
 
 extern "C" char* strchr(const char* p, int ch);
 
-static void logExecError(const char* argv[], int res, int status) {
+static void logExecError_xfrm(const char* argv[], int res_xfrm, int status_xfrm) {
     const char** argp = argv;
     std::string args = "";
     while (*argp) {
@@ -54,27 +40,27 @@ static void logExecError(const char* argv[], int res, int status) {
         args += ' ';
         argp++;
     }
-    ALOGE("exec() res=%d, status=%d for %s", res, status, args.c_str());
+    ALOGE("exec() res=%d, status=%d for %s", res_xfrm, status_xfrm, args.c_str());
 }
 
-static int execCommand(int argc, const char *argv[], bool silent) {
-    int res;
-    int status;
+static int execCommand_xfrm(int argc, const char *argv[], bool silent_xfrm) {
+    int res_xfrm;
+    int status_xfrm;
 
-    res = android_fork_execvp_ext(argc, (char **)argv, &status, false, LOG_ALOG,!silent,NULL,NULL,0);
-    if (res || !WIFEXITED(status) || WEXITSTATUS(status)) {
-        if (!silent) {
-            logExecError(argv, res, status);
+    res_xfrm = android_fork_execvp_ext(argc, (char **)argv, &status_xfrm, false, LOG_ALOG,!silent_xfrm,NULL,NULL,0);
+    if (res_xfrm || !WIFEXITED(status_xfrm) || WEXITSTATUS(status_xfrm)) {
+        if (!silent_xfrm) {
+            logExecError_xfrm(argv, res_xfrm, status_xfrm);
         }
-        if (res)
-            return res;
-        if (!WIFEXITED(status))
+        if (res_xfrm)
+            return res_xfrm;
+        if (!WIFEXITED(status_xfrm))
             return ECHILD;
     }
-    return res;
+    return res_xfrm;
 }
 
-static int execIptables(IptablesTarget target, bool silent, va_list args) {
+static int execIptables(IptablesTarget target, bool silent_xfrm, va_list args) {
     /* Read arguments from incoming va_list; we expect the list to be NULL terminated. */
     std::list<const char*> argsList;
     argsList.push_back(NULL);
@@ -88,32 +74,32 @@ static int execIptables(IptablesTarget target, bool silent, va_list args) {
         argsList.push_back(arg);
     } while (arg);
 
-    int i = 0;
+    int i_xfrm = 0;
     const char* argv[argsList.size()];
-    std::list<const char*>::iterator it;
-    for (it = argsList.begin(); it != argsList.end(); it++, i++) {
-        argv[i] = *it;
+    std::list<const char*>::iterator it_xfrm;
+    for (it_xfrm = argsList.begin(); it_xfrm != argsList.end(); it_xfrm++, i_xfrm++) {
+        argv[i_xfrm] = *it_xfrm;
     }
 
-    const char** temp = argv + 1; //skip argv[0]
+    const char** temp_xfrm = argv + 1; //skip argv[0]
     std::string debug = "";
-    while (*temp) {
-        debug += *temp;
+    while (*temp_xfrm) {
+        debug += *temp_xfrm;
         debug += " ";
-        temp++;
+        temp_xfrm++;
     }
     ALOGI("execIptables %s\n", debug.c_str());
 
-    int res = 0;
+    int res_xfrm = 0;
     if (target == V4 || target == V4V6) {
         argv[0] = IPTABLES_PATH;
-        res |= execCommand(argsList.size(), argv, silent);
+        res_xfrm |= execCommand_xfrm(argsList.size(), argv, silent_xfrm);
     }
     if (target == V6 || target == V4V6) {
         argv[0] = IP6TABLES_PATH;
-        res |= execCommand(argsList.size(), argv, silent);
+        res_xfrm |= execCommand_xfrm(argsList.size(), argv, silent_xfrm);
     }
-    return res;
+    return res_xfrm;
 }
 
 int execIptables(IptablesTarget target, ...) {
@@ -124,45 +110,37 @@ int execIptables(IptablesTarget target, ...) {
     return res;
 }
 
-int execIptablesSilently(IptablesTarget target, ...) {
-    va_list args;
-    va_start(args, target);
-    int res = execIptables(target, true, args);
-    va_end(args);
-    return res;
-}
-
-static int execNdcCmd(const char *command, bool silent, va_list args) {
+static int execNdcCmd(const char *command_xfrm, bool silent_xfrm, va_list args) {
     /* Read arguments from incoming va_list; we expect the list to be NULL terminated. */
     std::list<const char*> argsList;
     argsList.push_back(NULL);
     const char* arg;
-    argsList.push_back(command);
+    argsList.push_back(command_xfrm);
     do {
         arg = va_arg(args, const char *);
         argsList.push_back(arg);
     } while (arg);
 
-    int i = 0;
+    int i_xfrm = 0;
     const char* argv[argsList.size()];
-    std::list<const char*>::iterator it;
-    for (it = argsList.begin(); it != argsList.end(); it++, i++) {
-        argv[i] = *it;
+    std::list<const char*>::iterator it_xfrm;
+    for (it_xfrm = argsList.begin(); it_xfrm != argsList.end(); it_xfrm++, i_xfrm++) {
+        argv[i_xfrm] = *it_xfrm;
     }
 
-    const char** temp = argv + 1; //skip argv[0]
+    const char** temp_xfrm = argv + 1; //skip argv[0]
     std::string debug = "";
-    while (*temp) {
-        debug += *temp;
+    while (*temp_xfrm) {
+        debug += *temp_xfrm;
         debug += " ";
-        temp++;
+        temp_xfrm++;
     }
     ALOGI("execNdcCmd %s\n", debug.c_str());
 
-    int res = 0;
+    int res_xfrm = 0;
     argv[0] = NDC_PATH;
-    res = execCommand(argsList.size(), argv, silent);
-    return res;
+    res_xfrm = execCommand_xfrm(argsList.size(), argv, silent_xfrm);
+    return res_xfrm;
   
 }
 
@@ -174,55 +152,55 @@ int execNdcCmd(const char *command, ...) {
     return res;
 }
 
-static int execIpCmd(int family, bool silent, va_list args) {
+static int execIpCmd(int family_xfrm, bool silent_xfrm, va_list args) {
     /* Read arguments from incoming va_list; we expect the list to be NULL terminated. */
     std::list<const char*> argsList;
     argsList.push_back(NULL);
     argsList.push_back(NULL);
-    const char* arg;
+    const char* arg_xfrm;
 
     do {
-        arg = va_arg(args, const char *);
-        argsList.push_back(arg);
-    } while (arg);
+        arg_xfrm = va_arg(args, const char *);
+        argsList.push_back(arg_xfrm);
+    } while (arg_xfrm);
 
-    int i = 0;
+    int i_xfrm = 0;
     const char* argv[argsList.size()];
-    std::list<const char*>::iterator it;
-    for (it = argsList.begin(); it != argsList.end(); it++, i++) {
-        argv[i] = *it;
+    std::list<const char*>::iterator it_xfrm;
+    for (it_xfrm = argsList.begin(); it_xfrm != argsList.end(); it_xfrm++, i_xfrm++) {
+        argv[i_xfrm] = *it_xfrm;
     }
 
 
-    const char** temp = argv + 2; //skip argv[0] and argv[1]
+    const char** temp_xfrm = argv + 2; //skip argv[0] and argv[1]
     std::string debug = "";
-    while (*temp) {
-        debug += *temp;
+    while (*temp_xfrm) {
+        debug += *temp_xfrm;
         debug += " ";
-        temp++;
+        temp_xfrm++;
     }
     ALOGI("execIpCmd %s\n", debug.c_str());
 
-    int res = 0;
+    int res_xfrm = 0;
     argv[0] = IP_PATH;
-    if (family == AF_INET) {
+    if (family_xfrm == AF_INET) {
         argv[1] = "-4";
-        res |= execCommand(argsList.size(), argv, silent);
+        res_xfrm |= execCommand_xfrm(argsList.size(), argv, silent_xfrm);
     }
-    if (family == AF_INET6) {
+    if (family_xfrm == AF_INET6) {
         argv[1] = "-6";
-        res |= execCommand(argsList.size(), argv, silent);
+        res_xfrm |= execCommand_xfrm(argsList.size(), argv, silent_xfrm);
     }
-    return res;
+    return res_xfrm;
   
 }
 
-int execIpCmd(int family, ...) {
+int execIpCmd(int family_xfrm, ...) {
     va_list args;
-    va_start(args, family);
-    int res = execIpCmd(family, false, args);
+    va_start(args, family_xfrm);
+    int res_xfrm = execIpCmd(family_xfrm, false, args);
     va_end(args);
-    return res;
+    return res_xfrm;
 }
 
 const char* IptablesInterface::LOCAL_FILTER_INPUT = "fw_INPUT";  //AOSP chain

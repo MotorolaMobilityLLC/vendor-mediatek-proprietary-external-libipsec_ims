@@ -1,3 +1,9 @@
+/*Copyright (c) 2014 MediaTek Inc.
+*
+* Modification based on code covered by the mentioned copyright
+* and/or permission notice(s).
+*/
+
 #ifndef __NETUTILS_WRAPPER_INTERFACE_H__
 #define __NETUTILS_WRAPPER_INTERFACE_H__
 
